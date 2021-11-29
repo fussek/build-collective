@@ -18,28 +18,24 @@
     <div class="card-home-wrapper">
       <card
         :title="account.username"
-        :subtitle="`${balance} Ξ\t\t${account.balance} Tokens`"
+        :subtitle="`${balance} ETH\t\t \nYour balance: ${account.balance} Tokens\t\t \nYour address: ${address}`"
         :gradient="true"
       >
+
         <div class="explanations">
-          This data has been fetched from the blockchain. You started by
-          connecting MetaMask, and you fetched your data by reading the
-          blockchain. Try to modify the code to see what's happening!
+          <button class="simple-button" @click="addTokens">ADD 200 TOKENS</button>
         </div>
         <div class="explanations">
-          On your account on the contract, you have
-          {{ account.balance }} tokens. If you click
-          <button class="button-link" @click="addTokens">here</button>, you can
-          add some token to your account. Just give it a try! And think to put
-          an eye on Ganache!
-        </div>
+          YOUR PROJECTS: {{ account.balance }} projects. </div>
+        <div class="explanations">
+          YOUR ENTERPRISES: {{ account.balance }} enterprises. </div>
       </card>
       <card
           title="Create a project"
           subtitle="Create a new project with tokens balance and contributors"
           :gradient="true"
       >
-        <div v-if="!projectCreationTrigger" @click="toggleProjectCreation" style="cursor: pointer">Click to add a new project to your account</div>
+        <div v-if="!projectCreationTrigger" @click="toggleProjectCreation" style="cursor: pointer; margin: 25px 5px 20px 20px" >Click to add a new project to your account</div>
         <div v-if="projectCreationTrigger">
           <input
               type="text"
@@ -59,7 +55,7 @@
               class="input-username"
               placeholder="Contributors separated by comma"
           />
-          <button @click="createProject()"> SUBMIT !</button>
+          <button class="simple-button" @click="createProject()"> SUBMIT !</button>
         </div>
 
       </card>
@@ -68,7 +64,7 @@
           subtitle="Create a new enterprise with tokens balance and contributors"
           :gradient="true"
       >
-        <div v-if="!enterpriseCreationTrigger" @click="toggleEnterpriseCreation" style="cursor: pointer">Click to add a new enterprise</div>
+        <div v-if="!enterpriseCreationTrigger" @click="toggleEnterpriseCreation" style="cursor: pointer; margin: 25px 5px 20px 20px">Click to add a new enterprise</div>
         <div v-if="enterpriseCreationTrigger">
           <input
               type="text"
@@ -89,7 +85,7 @@
               placeholder="Contributors separated by comma"
           />
 
-        <button @click="createEnterpriseAccount()"> SUBMIT !</button>
+          <button class="simple-button" @click="createEnterpriseAccount()"> SUBMIT !</button>
         </div>
       </card>
     </div>
@@ -192,6 +188,10 @@ export default defineComponent({
   cursor: pointer;
 }
 
+.simple-button{
+  margin: 25px 5px 20px 20px;
+
+}
 .input-username {
   background: transparent;
   border: none;

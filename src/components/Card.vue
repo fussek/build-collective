@@ -43,9 +43,7 @@ export default {
   background: linear-gradient(
     to bottom,
     rgba(26, 18, 31, 0),
-    70%,
-    rgba(79, 231, 236, 0.5)
-  );
+    70%);
 }
 
 .blue-gradient {
@@ -64,7 +62,7 @@ export default {
   border-radius: 20px;
   overflow: hidden;
   margin: 20px auto;
-  box-shadow: 15px 20px 0px rgba(0, 0, 0, 0.2);
+  box-shadow: 15px 20px 0px rgba(0, 0, 0, 0.05);
 }
 
 .opaque {
