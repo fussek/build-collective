@@ -38,18 +38,18 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-weight: 600;
-  background: rgb(26, 18, 31);
+  background: rgb(241, 240, 240);
   color: rgb(255, 255, 255);
 }
 
 .navbar {
   display: flex;
-  background: rgb(30, 22, 36);
+  background: rgba(206, 206, 206, 0.2);
   border-bottom: 2px solid;
   border-image: linear-gradient(
       to right,
-      rgba(45, 31, 54, 0.5),
-      rgba(167, 79, 236, 0.5)
+      rgba(224, 218, 218, 0.5),
+      rgba(79, 231, 236, 0.5)
     )
     1;
 }

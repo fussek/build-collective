@@ -34,6 +34,64 @@
           an eye on Ganache!
         </div>
       </card>
+      <card
+          title="Create a project"
+          subtitle="Create a new project with tokens balance and contributors"
+          :gradient="true"
+      >
+        <div v-if="!projectCreationTrigger" @click="toggleProjectCreation" style="cursor: pointer">Click to add a new project to your account</div>
+        <div v-if="projectCreationTrigger">
+          <input
+              type="text"
+              v-model="projectName"
+              class="input-username"
+              placeholder="Name of the project"
+          />
+          <input
+              type="number"
+              v-model="projectTokensBalance"
+              class="input-username"
+              placeholder="Tokens balance"
+          />
+          <input
+              type="text"
+              v-model="projectContributorsList"
+              class="input-username"
+              placeholder="Contributors separated by comma"
+          />
+          <button @click="createProject()"> SUBMIT !</button>
+        </div>
+
+      </card>
+      <card
+          title="Create an enterprise"
+          subtitle="Create a new enterprise with tokens balance and contributors"
+          :gradient="true"
+      >
+        <div v-if="!enterpriseCreationTrigger" @click="toggleEnterpriseCreation" style="cursor: pointer">Click to add a new enterprise</div>
+        <div v-if="enterpriseCreationTrigger">
+          <input
+              type="text"
+              v-model="enterpriseName"
+              class="input-username"
+              placeholder="Name of the enterprise"
+          />
+          <input
+              type="number"
+              v-model="enterpriseTokensBalance"
+              class="input-username"
+              placeholder="Tokens balance"
+          />
+          <input
+              type="text"
+              v-model="enterpriseContributorsList"
+              class="input-username"
+              placeholder="Contributors separated by comma"
+          />
+
+        <button @click="createEnterpriseAccount()"> SUBMIT !</button>
+        </div>
+      </card>
     </div>
   </div>
 </template>
@@ -55,12 +113,15 @@ export default defineComponent({
   data() {
     const account = null
     const username = ''
-    return { account, username }
+    const project = null
+    let projectName = null
+    let enterpriseName = null
+    return { account, username, project, projectName, enterpriseName, projectCreationTrigger:false, enterpriseCreationTrigger: false }
   },
   methods: {
     async updateAccount() {
       const { address, contract } = this
-      this.account = await contract.methods.user(address).call()
+      this.account = await contract.methods.getUser(address).call()
     },
     async signUp() {
       const { contract, username } = this
@@ -74,6 +135,24 @@ export default defineComponent({
       await contract.methods.addBalance(200).send()
       await this.updateAccount()
     },
+    toggleProjectCreation() {
+      this.projectCreationTrigger = !this.projectCreationTrigger;
+    },
+    toggleEnterpriseCreation() {
+      this.enterpriseCreationTrigger = !this.enterpriseCreationTrigger;
+    },
+    async createProject() {
+      const { contract, project } = this
+      await contract.methods.createProject(this.projectName, 1).send()
+      await this.updateAccount()
+      this.projectCreationTrigger = false;
+    },
+    async createEnterpriseAccount() {
+      const { contract } = this
+      await contract.methods.createEnterpriseAccount(this.enterpriseName).send()
+      await this.updateAccount()
+      this.enterpriseCreationTrigger = false;
+    }
   },
   async mounted() {
     const { address, contract } = this

@@ -44,7 +44,7 @@ export default {
     to bottom,
     rgba(26, 18, 31, 0),
     70%,
-    rgba(167, 79, 236, 0.5)
+    rgba(79, 231, 236, 0.5)
   );
 }
 
@@ -53,7 +53,7 @@ export default {
     to bottom,
     rgba(26, 18, 31, 0),
     70%,
-    rgba(90, 90, 235, 0.5)
+    rgba(79, 231, 236, 0.5)
   );
 }
 
@@ -63,16 +63,18 @@ export default {
   flex-direction: column;
   border-radius: 20px;
   overflow: hidden;
+  margin: 20px auto;
+  box-shadow: 15px 20px 0px rgba(0, 0, 0, 0.2);
 }
 
 .opaque {
-  background: rgba(42, 28, 50, 1);
+  background: rgb(212, 212, 212);
 }
 
 .gradient {
   background: linear-gradient(
     to bottom,
-    rgba(42, 28, 50, 1),
+    rgb(210, 210, 210),
     99%,
     rgba(167, 79, 236, 0)
   );
@@ -84,11 +86,11 @@ export default {
 }
 
 .violet {
-  background: rgb(89, 25, 138);
+  background: rgb(102, 205, 205);
 }
 
 .blue {
-  background: rgb(90, 90, 235);
+  background: rgb(54, 187, 187);
 }
 
 .card-title {
