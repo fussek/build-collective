@@ -31,27 +31,31 @@ contract BuildCollective is Ownable {
   struct Project {
     User owner;
     EnterpriseAccount enterpriseOwner;
-    //User[] contributors;
-    int256 balance;
+    uint256 balance;
     string link;
     string name;
   }
 
   // Bounty
   struct Bounty {
+    string link;
     int256 reward;
     bool active;
   }
 
   EnterpriseAccount[] private enterprises;
   Project[] public projects;
+  Bounty[] public bounties;
 
   mapping(address => User) private users;
   mapping(address => uint[]) private userToEnterprises;
+  mapping(uint => address[]) private projectsToContributors;
+  mapping(uint => uint) private bountyToProject;
 
   event UserSignedUp(address indexed userAddress, User indexed user);
   event EnterpriseCreated(User indexed owner);
   event ProjectCreated(string name);
+  event BountyCreated();
 
   function getUser(address userAddress) public view returns (User memory) {
     return users[userAddress];
@@ -66,7 +70,7 @@ contract BuildCollective is Ownable {
     return userToEnterprises[msg.sender];
   }
 
-  function getProjects(() public view returns (Project[] memory) {
+  function getProjects() public view returns (Project[] memory) {
     return projects;
   }
 
@@ -102,9 +106,26 @@ contract BuildCollective is Ownable {
     emit ProjectCreated(name);
   }
 
+  function openBounty(string memory link, int256 reward, uint _projectId) public {
+    require(users[msg.sender].registered);
+    uint bounty_id = bounties.push(Bounty(link, reward, true)) - 1;
+    bountyToProject[bounty_id] = _projectId;
+    emit BountyCreated();
+  }
+
+  function closeBounty(uint _bountyId, address _hunterAddress) public returns (bool) {
+    require(users[msg.sender].registered);
+    bounties[_bountyId].active = false;
+    projects[bountyToProject[_bountyId]].balance -= uint(bounties[_bountyId].reward);
+    users[_hunterAddress].balance += uint(bounties[_bountyId].reward);
+    return true;
+  }
+
   function supportProject(uint _projectId, int256 amount) public returns (bool) {
     require(users[msg.sender].registered);
-    projects[_projectId].reward += amount;
+    users[msg.sender].balance -= uint(amount);
+    projects[_projectId].balance += uint(amount);
+    projectsToContributors[_projectId].push(msg.sender);
     return true;
   }
 
