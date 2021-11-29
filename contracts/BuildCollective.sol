@@ -23,7 +23,6 @@ contract BuildCollective is Ownable {
   // Enterprise
   struct EnterpriseAccount {
     string name;
-    User owner;
     uint256 balance;
     //User[] members;
   }
@@ -38,10 +37,11 @@ contract BuildCollective is Ownable {
     string name;
   }
 
-  EnterpriseAccount[] public enterprises;
+  EnterpriseAccount[] private enterprises;
   Project[] public projects;
 
   mapping(address => User) private users;
+  mapping(address => uint[]) private userToEnterprises;
 
   event UserSignedUp(address indexed userAddress, User indexed user);
   event EnterpriseCreated(User indexed owner);
@@ -53,6 +53,15 @@ contract BuildCollective is Ownable {
 
   function getEnterprise(uint _enterpriseId) public view returns (EnterpriseAccount memory) {
     return enterprises[_enterpriseId];
+  }
+
+  function getUserEnterpriseIds() public view returns (uint[] memory) {
+    require(users[msg.sender].registered);
+    return userToEnterprises[msg.sender];
+  }
+
+  function getProjects(uint _enterpriseId) public view returns (Project[] memory) {
+    return projects;
   }
 
   function signUp(string memory username) public returns (User memory) {
@@ -71,7 +80,8 @@ contract BuildCollective is Ownable {
   function createEnterpriseAccount(string memory name) public {
     require(users[msg.sender].registered);
     require(bytes(name).length > 0);
-    enterprises.push(EnterpriseAccount(name, users[msg.sender], 0));
+    uint enterprise_id = enterprises.push(EnterpriseAccount(name, 0)) - 1;
+    userToEnterprises[msg.sender].push(enterprise_id);
     emit EnterpriseCreated(users[msg.sender]);
   }
 
