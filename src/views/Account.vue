@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="home" v-if="!account">
+  <div class="home" v-if="!account && !showProjects">
     <form @submit.prevent="signUp">
       <card
         title="Enter your username here"
@@ -14,7 +14,7 @@
       </card>
     </form>
   </div>
-  <div class="home" v-if="account">
+  <div class="home" v-if="account && !showProjects">
     <div class="card-home-wrapper">
       <card
         :title="account.username"
@@ -25,12 +25,14 @@
         <div class="explanations">
           <button class="simple-button" @click="addTokens">ADD 200 TOKENS</button>
         </div>
-        <div class="explanations">
-          YOUR PROJECTS: {{ account.balance }} projects. </div>
+        <div class="explanations" @click="toggleShowProjects()" style="cursor: pointer">
+          Click here to see the list of projects
+          YOUR PROJECTS: {{ projects.length }} projects. </div>
         <div class="explanations">
           YOUR ENTERPRISES: {{ account.balance }} enterprises. </div>
       </card>
       <card
+          class="create-card"
           title="Create a project"
           subtitle="Create a new project with tokens balance and contributors"
           :gradient="true"
@@ -60,6 +62,7 @@
 
       </card>
       <card
+          class="create-card"
           title="Create an enterprise"
           subtitle="Create a new enterprise with tokens balance and contributors"
           :gradient="true"
@@ -90,6 +93,29 @@
       </card>
     </div>
   </div>
+  <div class="home" v-if="account && showProjects ">
+    <div class="card-home-wrapper">
+      <card
+          :title="`Your username: ${account.username}`"
+          subtitle="Projects list: (your projects are highlighted in red):"
+          :gradient="true"
+      >
+        <button class="simple-button" @click=toggleShowProjects()> BACK </button>
+
+        <div v-for="project in this.projects" v-bind:key="project.name">
+          <card
+              :title="`Project name: ${project.name}`"
+              :subtitle="`Owner of the project: ${project.owner.username}`"
+              v-bind:style=" project.owner.username == account.username ? 'border: 10px solid red;' : 'border: none;' "
+          />
+        </div>
+
+      </card>
+
+    </div>
+
+  </div>
+
 </template>
 
 <script lang="ts">
@@ -112,7 +138,8 @@ export default defineComponent({
     const project = null
     let projectName = null
     let enterpriseName = null
-    return { account, username, project, projectName, enterpriseName, projectCreationTrigger:false, enterpriseCreationTrigger: false }
+    const projects: any[] = []
+    return { account, username, project, projectName, enterpriseName, projects, projectCreationTrigger:false, enterpriseCreationTrigger: false, showProjects: false }
   },
   methods: {
     async updateAccount() {
@@ -137,11 +164,38 @@ export default defineComponent({
     toggleEnterpriseCreation() {
       this.enterpriseCreationTrigger = !this.enterpriseCreationTrigger;
     },
+    async toggleShowProjects() {
+      await this.getProjects()
+      this.showProjects = !this.showProjects;
+    },
+    async getProjects() {
+      this.projects = []
+      const { contract } = this
+      const projects = await contract.methods.getProjects().call()
+      if (projects.length > 0){
+        for (const project of projects) {
+          let name = project.name
+          let balance = project.balance
+          let owner = project.owner
+          this.projects.push({
+            id: project.id,
+            name: name,
+            balance: balance,
+            owner: owner
+          })
+        }
+      }
+    },
+    // filterProjects() {
+    //   const account = this
+    //   return this.projects.filter(project => project.owner.username === account.username)
+    // },
     async createProject() {
       const { contract, project } = this
       await contract.methods.createProject(this.projectName, 1).send()
       await this.updateAccount()
       this.projectCreationTrigger = false;
+      await this.getProjects()
     },
     async createEnterpriseAccount() {
       const { contract } = this
@@ -186,6 +240,9 @@ export default defineComponent({
   padding: 0;
   margin: 0;
   cursor: pointer;
+}
+.create-card{
+
 }
 
 .simple-button{
