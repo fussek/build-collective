@@ -32,9 +32,15 @@ contract BuildCollective is Ownable {
     User owner;
     EnterpriseAccount enterpriseOwner;
     //User[] contributors;
-    int256 reward;
+    int256 balance;
     string link;
     string name;
+  }
+
+  // Bounty
+  struct Bounty {
+    int256 reward;
+    bool active;
   }
 
   EnterpriseAccount[] private enterprises;
@@ -60,7 +66,7 @@ contract BuildCollective is Ownable {
     return userToEnterprises[msg.sender];
   }
 
-  function getProjects(uint _enterpriseId) public view returns (Project[] memory) {
+  function getProjects(() public view returns (Project[] memory) {
     return projects;
   }
 
