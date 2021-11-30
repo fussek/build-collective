@@ -102,7 +102,7 @@ contract BuildCollective is Ownable {
     if (_enterpriseId < 0) {
       enterprise = enterprises[_enterpriseId];
     }
-    projects.push(Project(users[msg.sender], enterprise, initialBalance, "", name));
+    projects.push(Project(users[msg.sender], enterprise, uint(initialBalance), "", name));
     emit ProjectCreated(name);
   }
 
