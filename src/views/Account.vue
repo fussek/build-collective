@@ -59,7 +59,6 @@
               placeholder="Contributors separated by comma"
           />
           <button class="simple-button" @click="createProject()"> SUBMIT !</button>
-          <button class="simple-button" @click="toggleProjectCreation"> CANCEL </button>
         </div>
 
       </card>
@@ -83,8 +82,14 @@
               class="input-username"
               placeholder="Tokens balance"
           />
+          <input
+              type="text"
+              v-model="enterpriseContributorsList"
+              class="input-username"
+              placeholder="Contributors separated by comma"
+          />
+
           <button class="simple-button" @click="createEnterpriseAccount()"> SUBMIT !</button>
-          <button class="simple-button" @click="toggleEnterpriseCreation"> CANCEL </button>
         </div>
       </card>
     </div>
@@ -107,17 +112,8 @@
           <div v-for="project in this.projects" v-bind:key="project.name">
             <card
               :title="`Project name: ${project.name}`"
-              :subtitle="`
-                  Owner of the project: ${project.owner.username}
-                  Balance: ${project.balance}`"
+              :subtitle="`Owner of the project: ${project.owner.username}`"
             />
-            <input
-              type="number"
-              v-model="projectDonation"
-              class="input-username"
-              placeholder="Amount"
-            />
-            <button class="simple-button" @click="donateToProject()"> DONATE </button>
           </div>
         </div>
         <div v-if="!projectsViewSwitch">
@@ -172,11 +168,10 @@ export default defineComponent({
     const username = '';
     const project = null;
     let projectName = null;
-    let projectTokensBalance = 0;
     let enterpriseName = null;
     const projects: any[] = [];
     const enterprises: any[] = [];
-    return { account, username, project, projectName, projectTokensBalance, enterpriseName, projects, enterprises, projectCreationTrigger:false, enterpriseCreationTrigger: false, showProjects: false, projectsViewSwitch: false, showEnterprises: false }
+    return { account, username, project, projectName, enterpriseName, projects, enterprises, projectCreationTrigger:false, enterpriseCreationTrigger: false, showProjects: false, projectsViewSwitch: false, showEnterprises: false }
   },
   methods: {
     async updateAccount() {
@@ -255,7 +250,7 @@ export default defineComponent({
     // },
     async createProject() {
       const { contract, project } = this
-      await contract.methods.createProject(this.projectName, this.projectTokensBalance).send()
+      await contract.methods.createProject(this.projectName, 1).send()
       await this.updateAccount()
       this.projectCreationTrigger = false;
       await this.getProjects()
@@ -265,14 +260,7 @@ export default defineComponent({
       await contract.methods.createEnterpriseAccount(this.enterpriseName).send()
       await this.updateAccount()
       this.enterpriseCreationTrigger = false;
-    },
-    async donateToProject() {
-      const { contract, project } = this
-      await contract.methods.supportProject(this.project, 1).send()
-      await this.updateAccount()
-      this.projectCreationTrigger = false;
-      await this.getProjects()
-    },
+    }
   },
   async mounted() {
     const { address, contract } = this
