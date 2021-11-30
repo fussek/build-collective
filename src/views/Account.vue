@@ -85,6 +85,13 @@
               class="input-username"
               placeholder="Tokens balance"
           />
+          <input
+              type="text"
+              v-model="enterpriseContributorsList"
+              class="input-username"
+              placeholder="Contributors separated by comma"
+          />
+
           <button class="simple-button" @click="createEnterpriseAccount()"> SUBMIT !</button>
           <button class="simple-button" @click="toggleEnterpriseCreation"> CANCEL </button>
         </div>
