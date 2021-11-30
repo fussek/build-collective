@@ -16,14 +16,14 @@ When the fix is pushed, the author will get the eth. He’s a bounty hunter.
 contract BuildCollective is Ownable {
   struct User {
     string username;
-    uint256 balance;
+    int balance;
     bool registered;
   }
 
   // Enterprise
   struct EnterpriseAccount {
     string name;
-    uint256 balance;
+    int balance;
     //User[] members;
   }
 
@@ -31,7 +31,7 @@ contract BuildCollective is Ownable {
   struct Project {
     User owner;
     EnterpriseAccount enterpriseOwner;
-    uint256 balance;
+    int balance;
     string link;
     string name;
   }
@@ -39,7 +39,7 @@ contract BuildCollective is Ownable {
   // Bounty
   struct Bounty {
     string link;
-    int256 reward;
+    uint reward;
     bool active;
   }
 
@@ -80,33 +80,35 @@ contract BuildCollective is Ownable {
     emit UserSignedUp(msg.sender, users[msg.sender]);
   }
 
-  function addBalance(uint256 amount) public returns (bool) {
+  function addBalance(uint amount) public returns (bool) {
     require(users[msg.sender].registered);
-    users[msg.sender].balance += amount;
+    users[msg.sender].balance += int(amount);
     return true;
   }
 
   // NEW functions
-  function createEnterpriseAccount(string memory name, uint balance) public {
+  function createEnterpriseAccount(string memory name, uint deposit) public {
     require(users[msg.sender].registered);
     require(bytes(name).length > 0);
-    uint enterprise_id = enterprises.push(EnterpriseAccount(name, balance)) - 1;
+    uint enterprise_id = enterprises.push(EnterpriseAccount(name, int(deposit))) - 1;
+    users[msg.sender].balance -= int(deposit);
     userToEnterprises[msg.sender].push(enterprise_id);
     emit EnterpriseCreated(users[msg.sender]);
   }
 
-  function createProject(string memory name, uint _enterpriseId, uint balance) public {
+  function createProject(string memory name, uint _enterpriseId, uint deposit) public {
     require(users[msg.sender].registered);
     require(bytes(name).length > 0);
     EnterpriseAccount memory enterprise;
     if (_enterpriseId < 0) {
       enterprise = enterprises[_enterpriseId];
     }
-    projects.push(Project(users[msg.sender], enterprise, balance, "", name));
+    projects.push(Project(users[msg.sender], enterprise, int(deposit), "", name));
+    users[msg.sender].balance -= int(deposit);
     emit ProjectCreated(name);
   }
 
-  function openBounty(string memory link, int256 reward, uint _projectId) public {
+  function openBounty(string memory link, uint reward, uint _projectId) public {
     require(users[msg.sender].registered);
     uint bounty_id = bounties.push(Bounty(link, reward, true)) - 1;
     bountyToProject[bounty_id] = _projectId;
@@ -116,15 +118,15 @@ contract BuildCollective is Ownable {
   function closeBounty(uint _bountyId, address _hunterAddress) public returns (bool) {
     require(users[msg.sender].registered);
     bounties[_bountyId].active = false;
-    projects[bountyToProject[_bountyId]].balance -= uint(bounties[_bountyId].reward);
-    users[_hunterAddress].balance += uint(bounties[_bountyId].reward);
+    projects[bountyToProject[_bountyId]].balance -= int(bounties[_bountyId].reward);
+    users[_hunterAddress].balance += int(bounties[_bountyId].reward);
     return true;
   }
 
-  function supportProject(uint _projectId, int256 amount) public returns (bool) {
+  function supportProject(uint _projectId, uint amount) public returns (bool) {
     require(users[msg.sender].registered);
-    users[msg.sender].balance -= uint(amount);
-    projects[_projectId].balance += uint(amount);
+    users[msg.sender].balance -= int(amount);
+    projects[_projectId].balance += int(amount);
     projectsToContributors[_projectId].push(msg.sender);
     return true;
   }
