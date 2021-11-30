@@ -97,18 +97,33 @@
   <div class="home" v-if="account && showProjects ">
     <div class="card-home-wrapper">
       <card
-          :title="`Your username: ${account.username}`"
-          subtitle="Projects list: (your projects are highlighted in red):"
-          :gradient="true"
+        :title="`Your username: ${account.username}`"
+        subtitle="Projects list:"
+        :gradient="true"
       >
-        <button class="simple-button" @click=toggleShowProjects()> BACK </button>
+        <button class="simple-button" @click="changeProjectsView()">
+          Show your projects / Show all projects
+        </button>
+        <button class="simple-button" @click="toggleShowProjects()">
+          BACK
+        </button>
 
-        <div v-for="project in this.projects" v-bind:key="project.name">
-          <card
+        <div v-if="projectsViewSwitch">
+          <div v-for="project in this.projects" v-bind:key="project.name">
+            <card
               :title="`Project name: ${project.name}`"
               :subtitle="`Owner of the project: ${project.owner.username}`"
-              v-bind:style=" project.owner.username == account.username ? 'border: 10px solid red;' : 'border: none;' "
-          />
+            />
+          </div>
+        </div>
+        <div v-if="!projectsViewSwitch">
+          <div v-for="project in this.projects" v-bind:key="project.name">
+            <card
+              v-if="project.owner.username == account.username"
+              :title="`Project name: ${project.name}`"
+              :subtitle="`Owner of the project: ${project.owner.username}`"
+            />
+          </div>
         </div>
       </card>
     </div>
@@ -156,7 +171,7 @@ export default defineComponent({
     let enterpriseName = null;
     const projects: any[] = [];
     const enterprises: any[] = [];
-    return { account, username, project, projectName, enterpriseName, projects, enterprises, projectCreationTrigger:false, enterpriseCreationTrigger: false, showProjects: false, showEnterprises: false }
+    return { account, username, project, projectName, enterpriseName, projects, enterprises, projectCreationTrigger:false, enterpriseCreationTrigger: false, showProjects: false, projectsViewSwitch: false, showEnterprises: false }
   },
   methods: {
     async updateAccount() {
@@ -180,6 +195,9 @@ export default defineComponent({
     },
     toggleEnterpriseCreation() {
       this.enterpriseCreationTrigger = !this.enterpriseCreationTrigger;
+    },
+    changeProjectsView() {
+      this.projectsViewSwitch = !this.projectsViewSwitch
     },
     async toggleShowProjects() {
       await this.getProjects();
@@ -266,7 +284,13 @@ export default defineComponent({
 .explanations {
   padding: 12px;
 }
-
+.clickable-explanations {
+  padding: 15px;
+  transition: transform 0.2s; /* Animation */
+}
+.clickable-explanations:hover {
+  transform: scale(1.1);
+}
 .button-link {
   display: inline;
   appearance: none;
@@ -287,6 +311,14 @@ export default defineComponent({
 
 .simple-button{
   margin: 25px 5px 20px 20px;
+  display: inline-block;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 15px;
+  font-family: inherit;
 
 }
 .input-username {
