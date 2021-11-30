@@ -14,7 +14,7 @@
       </card>
     </form>
   </div>
-  <div class="home" v-if="account && !showProjects && !showEnterprises">
+  <div class="home" v-if="account && !showProjects">
     <div class="card-home-wrapper">
       <card
         :title="account.username"
@@ -27,20 +27,15 @@
           </button>
         </div>
         <div
-          class="explanations"
+          class="clickable-explanations"
           @click="toggleShowProjects()"
           style="cursor: pointer"
         >
           Click here to see the list of projects YOUR PROJECTS:
           {{ projects.length }} projects.
         </div>
-        <div
-          class="explanations"
-          @click="toggleShowEnterprises()"
-          style="cursor: pointer"
-        >
-          Click here to see your enterprises. YOUR ENTERPRISES:
-          {{ enterprises.length }} enterprises.
+        <div class="explanations">
+          YOUR ENTERPRISES: {{ account.balance }} enterprises.
         </div>
       </card>
       <card
@@ -124,46 +119,32 @@
     <div class="card-home-wrapper">
       <card
         :title="`Your username: ${account.username}`"
-        subtitle="Projects list: (your projects are highlighted in red):"
+        subtitle="Projects list:"
         :gradient="true"
       >
+        <button class="simple-button" @click="changeProjectsView()">
+          Show your projects / Show all projects
+        </button>
         <button class="simple-button" @click="toggleShowProjects()">
           BACK
         </button>
 
-        <div v-for="project in this.projects" v-bind:key="project.name">
-          <card
-            :title="`Project name: ${project.name}`"
-            :subtitle="`Owner of the project: ${project.owner.username}`"
-            v-bind:style="
-              project.owner.username == account.username
-                ? 'border: 10px solid red;'
-                : 'border: none;'
-            "
-          />
+        <div v-if="projectsViewSwitch">
+          <div v-for="project in this.projects" v-bind:key="project.name">
+            <card
+              :title="`Project name: ${project.name}`"
+              :subtitle="`Owner of the project: ${project.owner.username}`"
+            />
+          </div>
         </div>
-      </card>
-    </div>
-  </div>
-  <div class="home" v-if="account && showEnterprises">
-    <div class="card-home-wrapper">
-      <card
-        :title="`Your username: ${account.username}`"
-        subtitle="Enterprises list:"
-        :gradient="true"
-      >
-        <button class="simple-button" @click="toggleShowEnterprises()">
-          BACK
-        </button>
-
-        <div
-          v-for="enterprise in this.enterprises"
-          v-bind:key="enterprise.name"
-        >
-          <card
-            :title="`Enterprise name: ${enterprise.name}`"
-            :subtitle="`Balance: ${enterprise.balance}`"
-          />
+        <div v-if="!projectsViewSwitch">
+          <div v-for="project in this.projects" v-bind:key="project.name">
+            <card
+              v-if="project.owner.username == account.username"
+              :title="`Project name: ${project.name}`"
+              :subtitle="`Owner of the project: ${project.owner.username}`"
+            />
+          </div>
         </div>
       </card>
     </div>
@@ -191,7 +172,6 @@ export default defineComponent({
     let projectName = null
     let enterpriseName = null
     const projects: any[] = []
-    const enterprises: any[] = []
     return {
       account,
       username,
@@ -199,11 +179,10 @@ export default defineComponent({
       projectName,
       enterpriseName,
       projects,
-      enterprises,
       projectCreationTrigger: false,
       enterpriseCreationTrigger: false,
       showProjects: false,
-      showEnterprises: false,
+      projectsViewSwitch: false,
     }
   },
   methods: {
@@ -229,6 +208,9 @@ export default defineComponent({
     toggleEnterpriseCreation() {
       this.enterpriseCreationTrigger = !this.enterpriseCreationTrigger
     },
+    changeProjectsView() {
+      this.projectsViewSwitch = !this.projectsViewSwitch
+    },
     async toggleShowProjects() {
       await this.getProjects()
       this.showProjects = !this.showProjects
@@ -251,37 +233,6 @@ export default defineComponent({
         }
       }
     },
-    async toggleShowEnterprises() {
-      await this.getUserEnterpriseIds()
-      this.showEnterprises = !this.showEnterprises
-    },
-    async getUserEnterpriseIds() {
-      this.enterprises = []
-      const { contract } = this
-      const enterprisesIds = await contract.methods
-        .getUserEnterpriseIds()
-        .call()
-      if (enterprisesIds.length > 0) {
-        for (const enterprisesId of enterprisesIds) {
-          const enterprise = await contract.methods
-            .getEnterprise(enterprisesId)
-            .call()
-          let name = enterprise.name
-          let balance = enterprise.balance
-          let owner = enterprise.owner
-          this.enterprises.push({
-            id: enterprise.id,
-            name: name,
-            balance: balance,
-            owner: owner,
-          })
-        }
-      }
-    },
-    // filterProjects() {
-    //   const account = this
-    //   return this.projects.filter(project => project.owner.username === account.username)
-    // },
     async createProject() {
       const { contract, project } = this
       await contract.methods.createProject(this.projectName, 1).send()
@@ -311,14 +262,20 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   justify-content: center;
-  max-width: 1000px;
+  max-width: 500px;
   margin: auto;
 }
 
 .explanations {
   padding: 12px;
 }
-
+.clickable-explanations {
+  padding: 15px;
+  transition: transform 0.2s; /* Animation */
+}
+.clickable-explanations:hover {
+  transform: scale(1.1);
+}
 .button-link {
   display: inline;
   appearance: none;
@@ -333,9 +290,19 @@ export default defineComponent({
   margin: 0;
   cursor: pointer;
 }
+.create-card {
+}
 
 .simple-button {
   margin: 25px 5px 20px 20px;
+  display: inline-block;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 15px;
+  font-family: inherit;
 }
 .input-username {
   background: transparent;
