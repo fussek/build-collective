@@ -3,9 +3,10 @@
 - Fall semester 2021
 - 
 # Video demo (YouTube link)
-[![Watch the video](https://img.youtube.com/vi/BjrnNH0MUZc/maxresdefault.jpg)](https://youtu.be/BjrnNH0MUZc)
-
 https://youtu.be/BjrnNH0MUZc
+# Video demo
+https://user-images.githubusercontent.com/45184925/144050507-ea12dd37-b670-4d5c-90d1-2e0d2381b3cb.mp4
+
 
 # Installation
 
