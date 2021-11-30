@@ -138,7 +138,8 @@
               :title="`Project name: ${project.name}`"
               :subtitle="`
                   Owner of the project: ${project.owner.username}
-                  Balance: ${project.balance}`"
+                  Balance: ${project.balance}
+                  URL: ${project.link}`"
             />
             <div style="margin: 10px">
               Enter number of tokens you wish to donate:
@@ -159,8 +160,21 @@
               :title="`Project name: ${project.name}`"
               :subtitle="`
                   Owner of the project: ${project.owner.username}
-                  Balance: ${project.balance}`"
+                  Balance: ${project.balance}
+                  URL: ${project.link}`"
             />
+            <div
+              style="margin: 10px"
+              v-if="project.owner.username == account.username"
+            >
+              Link to the project:
+              <input
+                type='text'
+                v-model="projectLink"
+                placeholder='URL'
+              />
+              <button @click="addProjectLink(project)">SAVE</button>
+            </div>
           </div>
         </div>
       </card>
@@ -212,6 +226,7 @@ export default defineComponent({
     let projectName = null
     let projectTokensBalance = 0
     let projectDonation = 0
+    let projectLink = ''
     let enterpriseName = null
     let enterpriseTokensBalance = 0
     const projects: any[] = []
@@ -223,6 +238,7 @@ export default defineComponent({
       projectName,
       projectTokensBalance,
       projectDonation,
+      projectLink,
       enterpriseName,
       enterpriseTokensBalance,
       projects,
@@ -338,6 +354,16 @@ export default defineComponent({
       await this.updateAccount()
       this.projectCreationTrigger = false
       this.projectDonation = 0
+      await this.getProjects()
+    },
+    async addProjectLink(project: any) {
+      const { contract } = this
+      await contract.methods
+        .addLink(project.id, this.projectLink)
+        .send()
+      await this.updateAccount()
+      this.projectCreationTrigger = false
+      this.projectLink = ''
       await this.getProjects()
     },
   },

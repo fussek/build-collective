@@ -1,7 +1,7 @@
 # DAAR Project 3 - Build Collective
 - Authors: Duc Huy Do, Patryk Fussek
 - Fall semester 2021
-- 
+-
 # Video demo (YouTube link)
 https://youtu.be/BjrnNH0MUZc
 # Video demo
@@ -95,4 +95,5 @@ Implement an OpenCollective from scratch in Solidity.
 
 # Implementation
 
-- There are new structures and methods for Enterprises, Projects and Bounties
+- Solidity: There are new structures and methods for Enterprises, Projects and Bounties
+- Frontend: The interface currently supports only Enterprises and Projects.
