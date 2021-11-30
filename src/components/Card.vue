@@ -40,10 +40,7 @@ export default {
 }
 
 .violet-gradient {
-  background: linear-gradient(
-    to bottom,
-    rgba(26, 18, 31, 0),
-    70%);
+  background: linear-gradient(to bottom, rgba(26, 18, 31, 0), 70%);
 }
 
 .blue-gradient {
