@@ -1,8 +1,6 @@
-# Build Collective
-
-Welcome to the DAAR project. The idea will be to implement an OpenCollective competitor
-in a decentralized way, on Ethereum. This will have cool side effects, like not
-be forced to pay for servers.
+# DAAR Project 3 - Build Collective
+- Authors: Duc Huy Do, Patryk Fussek
+- Fall semester 2021
 
 # Installation
 
@@ -88,3 +86,7 @@ Implement an OpenCollective from scratch in Solidity.
 - Create a page to open an entreprise account.
 - Create a page to create a project.
 - Create a page to get a full recap of everything that happened on a project as a timeline.
+
+# Implementation
+
+- There are new structures and methods for Enterprises, Projects and Bounties

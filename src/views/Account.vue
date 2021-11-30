@@ -281,9 +281,6 @@ export default defineComponent({
   margin: 0;
   cursor: pointer;
 }
-.create-card{
-
-}
 
 .simple-button{
   margin: 25px 5px 20px 20px;
