@@ -1,6 +1,11 @@
 # DAAR Project 3 - Build Collective
 - Authors: Duc Huy Do, Patryk Fussek
 - Fall semester 2021
+- 
+# Video demo (YouTube link)
+[![Watch the video](https://img.youtube.com/vi/BjrnNH0MUZc/maxresdefault.jpg)](https://youtu.be/BjrnNH0MUZc)
+
+https://youtu.be/BjrnNH0MUZc
 
 # Installation
 
