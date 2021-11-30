@@ -87,22 +87,22 @@ contract BuildCollective is Ownable {
   }
 
   // NEW functions
-  function createEnterpriseAccount(string memory name) public {
+  function createEnterpriseAccount(string memory name, uint balance) public {
     require(users[msg.sender].registered);
     require(bytes(name).length > 0);
-    uint enterprise_id = enterprises.push(EnterpriseAccount(name, 0)) - 1;
+    uint enterprise_id = enterprises.push(EnterpriseAccount(name, balance)) - 1;
     userToEnterprises[msg.sender].push(enterprise_id);
     emit EnterpriseCreated(users[msg.sender]);
   }
 
-  function createProject(string memory name, uint _enterpriseId) public {
+  function createProject(string memory name, uint _enterpriseId, uint balance) public {
     require(users[msg.sender].registered);
     require(bytes(name).length > 0);
     EnterpriseAccount memory enterprise;
     if (_enterpriseId < 0) {
       enterprise = enterprises[_enterpriseId];
     }
-    projects.push(Project(users[msg.sender], enterprise, 0, "", name));
+    projects.push(Project(users[msg.sender], enterprise, balance, "", name));
     emit ProjectCreated(name);
   }
 

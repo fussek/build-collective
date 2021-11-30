@@ -25,12 +25,14 @@
         <div class="explanations">
           <button class="simple-button" @click="addTokens">ADD 200 TOKENS</button>
         </div>
-        <div class="explanations" @click="toggleShowProjects()" style="cursor: pointer">
+        <div class="explanations" @click="toggleShowProjects()" style="cursor: pointer; font-size: 20px; margin: 10px">
           Click here to see the list of projects
-          YOUR PROJECTS: {{ projects.length }} projects. </div>
-        <div class="explanations" @click="toggleShowEnterprises()" style="cursor: pointer">
-          Click here to see your enterprises.
-          YOUR ENTERPRISES: {{ enterprises.length }} enterprises. </div>
+          <div style="font-size: 15px; margin: 5px">TOTAL N° PROJECTS: {{ projects.length }} projects.</div>
+           </div>
+        <div class="explanations" @click="toggleShowEnterprises()" style="cursor: pointer; font-size: 20px; margin: 10px">
+          Click here to see the list of enterprises.
+          <div style="font-size: 15px; margin: 5px">TOTAL N° ENTERPRISES: {{ enterprises.length }} enterprises. </div>
+          </div>
       </card>
       <card
           class="create-card"
@@ -38,7 +40,7 @@
           subtitle="Create a new project with tokens balance and contributors"
           :gradient="true"
       >
-        <div v-if="!projectCreationTrigger" @click="toggleProjectCreation" style="cursor: pointer; margin: 25px 5px 20px 20px" >Click to add a new project to your account</div>
+        <div v-if="!projectCreationTrigger" @click="toggleProjectCreation" style="cursor: pointer; margin: 25px 5px 20px 20px; font-size: 20px" >Click to add a new project to your account</div>
         <div v-if="projectCreationTrigger">
           <input
               type="text"
@@ -69,7 +71,7 @@
           subtitle="Create a new enterprise with tokens balance and contributors"
           :gradient="true"
       >
-        <div v-if="!enterpriseCreationTrigger" @click="toggleEnterpriseCreation" style="cursor: pointer; margin: 25px 5px 20px 20px">Click to add a new enterprise</div>
+        <div v-if="!enterpriseCreationTrigger" @click="toggleEnterpriseCreation" style="cursor: pointer; margin: 25px 5px 20px 20px; font-size: 20px">Click to add a new enterprise</div>
         <div v-if="enterpriseCreationTrigger">
           <input
               type="text"
@@ -93,7 +95,7 @@
     <div class="card-home-wrapper">
       <card
         :title="`Your username: ${account.username}`"
-        subtitle="Projects list:"
+        :subtitle="`Your token balance: ${account.balance}`"
         :gradient="true"
       >
         <button class="simple-button" @click="changeProjectsView()">
@@ -105,27 +107,31 @@
 
         <div v-if="projectsViewSwitch">
           <div v-for="project in this.projects" v-bind:key="project.name">
-            <card
+            <card style="margin: 10px"
               :title="`Project name: ${project.name}`"
               :subtitle="`
                   Owner of the project: ${project.owner.username}
                   Balance: ${project.balance}`"
             />
-            <input
-              type="number"
-              v-model="projectDonation"
-              class="input-username"
-              placeholder="Amount"
-            />
-            <button class="simple-button" @click="donateToProject()"> DONATE </button>
+            <div style="margin: 10px">
+              Enter number of tokens you wish to donate:
+              <input
+                  type="number"
+                  v-model="projectDonation"
+                  placeholder="Amount"
+              />
+              <button @click="donateToProject(project)"> DONATE </button>
+            </div>
           </div>
         </div>
         <div v-if="!projectsViewSwitch">
           <div v-for="project in this.projects" v-bind:key="project.name">
-            <card
+            <card style="margin: 10px"
               v-if="project.owner.username == account.username"
               :title="`Project name: ${project.name}`"
-              :subtitle="`Owner of the project: ${project.owner.username}`"
+              :subtitle="`
+                  Owner of the project: ${project.owner.username}
+                  Balance: ${project.balance}`"
             />
           </div>
         </div>
@@ -173,10 +179,12 @@ export default defineComponent({
     const project = null;
     let projectName = null;
     let projectTokensBalance = 0;
+    let projectDonation = 0;
     let enterpriseName = null;
+    let enterpriseTokensBalance = 0;
     const projects: any[] = [];
     const enterprises: any[] = [];
-    return { account, username, project, projectName, projectTokensBalance, enterpriseName, projects, enterprises, projectCreationTrigger:false, enterpriseCreationTrigger: false, showProjects: false, projectsViewSwitch: false, showEnterprises: false }
+    return { account, username, project, projectName, projectTokensBalance, projectDonation, enterpriseName, enterpriseTokensBalance, projects, enterprises, projectCreationTrigger:false, enterpriseCreationTrigger: false, showProjects: false, projectsViewSwitch: false, showEnterprises: false }
   },
   methods: {
     async updateAccount() {
@@ -213,12 +221,12 @@ export default defineComponent({
       const { contract } = this
       const projects = await contract.methods.getProjects().call()
       if (projects.length > 0){
-        for (const project of projects) {
-          let name = project.name
-          let balance = project.balance
-          let owner = project.owner
+        for (let n = 0; n < projects.length; n++) {
+          let name = projects[n].name
+          let balance = projects[n].balance
+          let owner = projects[n].owner
           this.projects.push({
-            id: project.id,
+            id: n,
             name: name,
             balance: balance,
             owner: owner
@@ -249,28 +257,26 @@ export default defineComponent({
         }
       }
     },
-    // filterProjects() {
-    //   const account = this
-    //   return this.projects.filter(project => project.owner.username === account.username)
-    // },
     async createProject() {
       const { contract, project } = this
-      await contract.methods.createProject(this.projectName, this.projectTokensBalance).send()
+      await contract.methods.createProject(this.projectName, 0, this.projectTokensBalance).send()
       await this.updateAccount()
       this.projectCreationTrigger = false;
       await this.getProjects()
     },
     async createEnterpriseAccount() {
       const { contract } = this
-      await contract.methods.createEnterpriseAccount(this.enterpriseName).send()
+      await contract.methods.createEnterpriseAccount(this.enterpriseName, this.enterpriseTokensBalance).send()
       await this.updateAccount()
       this.enterpriseCreationTrigger = false;
+      await this.getUserEnterpriseIds()
     },
-    async donateToProject() {
-      const { contract, project } = this
-      await contract.methods.supportProject(this.project, 1).send()
+    async donateToProject(project : any) {
+      const { contract } = this
+      await contract.methods.supportProject(project.id, this.projectDonation).send()
       await this.updateAccount()
       this.projectCreationTrigger = false;
+      this.projectDonation = 0;
       await this.getProjects()
     },
   },
